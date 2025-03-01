@@ -12,8 +12,8 @@ importers:
         specifier: ^14.4.6
         version: 14.4.6
       tough-cookie:
-        specifier: ^5.1.1
-        version: 5.1.1
+        specifier: ^5.1.2
+        version: 5.1.2
     devDependencies:
       '@types/tough-cookie':
         specifier: ^4.0.5
@@ -124,8 +124,8 @@ packages:
     resolution: {integrity: sha512-rv8LUyez4Ygkopqn+M6OLItAOT9FF3REpPQDkdMx5ix8w4qkuE7Vo2o/vw1nxKQYmJDV8JpAMJQr1b+lTKf0FA==}
     hasBin: true
 
-  tough-cookie@5.1.1:
-    resolution: {integrity: sha512-Ek7HndSVkp10hmHP9V4qZO1u+pn1RU5sI0Fw+jCU3lyvuMZcgqsNgc6CmJJZyByK4Vm/qotGRJlfgAX8q+4JiA==}
+  tough-cookie@5.1.2:
+    resolution: {integrity: sha512-FVDYdxtnj0G6Qm/DhNPSb8Ju59ULcup3tuJxkFb5K8Bv2pUXILbf0xZWU8PX8Ov19OXljbUyveOFwRMwkXzO+A==}
     engines: {node: '>=16'}
 
   type-fest@4.27.0:
@@ -229,7 +229,7 @@ snapshots:
     dependencies:
       tldts-core: 6.1.61
 
-  tough-cookie@5.1.1:
+  tough-cookie@5.1.2:
     dependencies:
       tldts: 6.1.61
 
