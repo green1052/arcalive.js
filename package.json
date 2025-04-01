@@ -16,7 +16,7 @@
     "typescript": "^5.8.2"
   },
   "dependencies": {
-    "got": "^14.4.6",
+    "got": "^14.4.7",
     "tough-cookie": "^5.1.2"
   }
 }
