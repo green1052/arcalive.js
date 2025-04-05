@@ -13,7 +13,7 @@
   "packageManager": "pnpm@10.7.1",
   "devDependencies": {
     "@types/tough-cookie": "^4.0.5",
-    "typescript": "^5.8.2"
+    "typescript": "^5.8.3"
   },
   "dependencies": {
     "got": "^14.4.7",
