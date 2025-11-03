@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       got:
-        specifier: ^14.6.1
-        version: 14.6.1
+        specifier: ^14.6.2
+        version: 14.6.2
       tough-cookie:
         specifier: ^6.0.0
         version: 6.0.0
@@ -44,6 +44,10 @@ packages:
   '@types/tough-cookie@4.0.5':
     resolution: {integrity: sha512-/Ad8+nIOV7Rl++6f1BdKxFSMgmoqEoYbHRpPcx3JEfv8VRsQe9Z4mCXeJBzxs7mbHY/XOZZuXlRNfhpVPbs6ZA==}
 
+  byte-counter@0.1.0:
+    resolution: {integrity: sha512-jheRLVMeUKrDBjVw2O5+k4EvR4t9wtxHL+bo/LxfkxsVeuGMy3a5SEGgXdAFA4FSzTrU8rQXQIrsZ3oBq5a0pQ==}
+    engines: {node: '>=20'}
+
   cacheable-lookup@7.0.0:
     resolution: {integrity: sha512-+qJyx4xiKra8mZrcwhjMRMUhD5NR1R8esPkzIYxX96JiecFoxAXFuz/GpR3+ev4PE1WamHip78wV0vcmPQtp8w==}
     engines: {node: '>=14.16'}
@@ -68,8 +72,8 @@ packages:
     resolution: {integrity: sha512-kVCxPF3vQM/N0B1PmoqVUqgHP+EeVjmZSQn+1oCRPxd2P21P2F19lIgbR3HBosbB1PUhOAoctJnfEn2GbN2eZA==}
     engines: {node: '>=18'}
 
-  got@14.6.1:
-    resolution: {integrity: sha512-56lZOw904LHKr6KdKN0Zbgz9Lw6cpEAAqZcS+0iY4D27caHoLiFT0EGCbrX9ZKYvt+I2lGl3a8eeDNSbmhyjkQ==}
+  got@14.6.2:
+    resolution: {integrity: sha512-bnhvxegqufyxHAmzwCZSscjGLVpw6/NzTXOk2tQVu/b9Q9FeMAgLabYulXEQRwP04UYltnkcZwvBq14fsdqvyw==}
     engines: {node: '>=20'}
 
   http-cache-semantics@4.2.0:
@@ -153,6 +157,8 @@ snapshots:
 
   '@types/tough-cookie@4.0.5': {}
 
+  byte-counter@0.1.0: {}
+
   cacheable-lookup@7.0.0: {}
 
   cacheable-request@13.0.12:
@@ -178,10 +184,11 @@ snapshots:
       '@sec-ant/readable-stream': 0.4.1
       is-stream: 4.0.1
 
-  got@14.6.1:
+  got@14.6.2:
     dependencies:
       '@sindresorhus/is': 7.0.1
       '@szmarczak/http-timer': 5.0.1
+      byte-counter: 0.1.0
       cacheable-lookup: 7.0.0
       cacheable-request: 13.0.12
       decompress-response: 10.0.0
