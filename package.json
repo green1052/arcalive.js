@@ -17,6 +17,6 @@
   },
   "dependencies": {
     "got": "^15.1.0",
-    "tough-cookie": "^6.0.1"
+    "tough-cookie": "^6.0.2"
   }
 }
