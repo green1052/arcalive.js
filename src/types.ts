@@ -160,6 +160,8 @@ export interface Article {
     deal?: unknown | null;
     blockPreview?: boolean | null;
     isSpoilerAlert?: boolean | null;
+    isUser?: boolean | null;
+    mark?: "image" | "best" | string | null;
     rateValue?: number | null;
     isRelay?: boolean | null;
     liveConfig?: unknown | null;
@@ -168,7 +170,10 @@ export interface Article {
 
 export interface ArticlesResponse {
     articles?: Article[] | null;
-    next?: Record<string, string> | null;
+    next?: {
+        before: string;
+        offset: string;
+    };
 }
 
 export interface Rating {
