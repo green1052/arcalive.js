@@ -10,24 +10,24 @@ export type ContentPart =
     | { type: "emoticons"; emoticonUrls: string[] }
 
 function uuid(): string {
-    return crypto.randomUUID()
+    return crypto.randomUUID();
 }
 
 function serialize(part: ContentPart): string {
     switch (part.type) {
         case "text":
             // TextArticleElement — showPlaceholder/focused=false 생략, text는 TextFieldValueSerializer가 문자열만 인코딩
-            return JSON.stringify({ text: part.text, uuid: uuid() })
+            return JSON.stringify({text: part.text, uuid: uuid()});
         case "html":
             // HtmlArticleElement
-            return JSON.stringify({ tag: part.tag, html: part.html, uuid: uuid() })
+            return JSON.stringify({tag: part.tag, html: part.html, uuid: uuid()});
         case "media": {
             // RemoteMediaArticleElement — width/height=0이면 생략
-            const o: Record<string, unknown> = { url: part.url, tag: part.tag }
-            if (part.width) o.width = part.width
-            if (part.height) o.height = part.height
-            o.uuid = uuid()
-            return JSON.stringify(o)
+            const o: Record<string, unknown> = {url: part.url, tag: part.tag};
+            if (part.width) o.width = part.width;
+            if (part.height) o.height = part.height;
+            o.uuid = uuid();
+            return JSON.stringify(o);
         }
         case "videoLink":
             // VideoLinkArticleElement — 전부 nullable, 전부 인코딩
@@ -36,14 +36,14 @@ function serialize(part: ContentPart): string {
                 description: part.description ?? null,
                 imageUrl: part.imageUrl ?? null,
                 html: part.html ?? null,
-                uuid: uuid(),
-            })
+                uuid: uuid()
+            });
         case "emoticon":
             // EmoticonArticleElement
-            return JSON.stringify({ emoticonUrl: part.emoticonUrl, uuid: uuid() })
+            return JSON.stringify({emoticonUrl: part.emoticonUrl, uuid: uuid()});
         case "emoticons":
             // EmoticonsArticleElement
-            return JSON.stringify({ emoticonUrls: part.emoticonUrls, uuid: uuid() })
+            return JSON.stringify({emoticonUrls: part.emoticonUrls, uuid: uuid()});
     }
 }
 
@@ -53,10 +53,10 @@ function serialize(part: ContentPart): string {
  * ArticleElementTypeConverter.fromModel과 동일.
  */
 export function buildContent(parts: ContentPart[]): string {
-    return JSON.stringify(parts.map((p) => ({ key: p.type, value: serialize(p) })))
+    return JSON.stringify(parts.map((p) => ({key: p.type, value: serialize(p)})));
 }
 
 /** 단순 텍스트 → content 문자열. text 요소 하나로 감쌈. */
 export function textContent(text: string): string {
-    return buildContent([{ type: "text", text }])
+    return buildContent([{type: "text", text}]);
 }

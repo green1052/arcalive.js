@@ -1,18 +1,25 @@
 import type {Http} from "../internal/http.ts";
-import type {ArticlePostingMetadata, ArticlesResponse, ChannelArticlesQuery, ChannelResponse, Result} from "../types.ts";
+import type {
+    ArticlePostingMetadata,
+    ArticlesResponse,
+    ChannelArticlesQuery,
+    ChannelResponse,
+    Result
+} from "../types.ts";
 import {buildContent, type ContentPart} from "../posting.ts";
 import {ArticleApi} from "./article.ts";
 
 export interface PostArticleParams {
-    title?: string
+    title?: string;
     /** 본문. string = 그대로 전달, ContentPart[] = buildContent 자동 호출로 JSON 배열 문자열 생성 */
-    content?: string | ContentPart[]
-    category?: string
-    token?: string
-    isSensitive?: string
-    "g-recaptcha-response"?: string
-    password?: string
-    [key: string]: string | ContentPart[] | undefined
+    content?: string | ContentPart[];
+    category?: string;
+    token?: string;
+    isSensitive?: string;
+    "g-recaptcha-response"?: string;
+    password?: string;
+
+    [key: string]: string | ContentPart[] | undefined;
 }
 
 export class ChannelApi {
@@ -49,12 +56,12 @@ export class ChannelApi {
      * content는 string(직접) 또는 ContentPart[](buildContent 자동 호출).
      */
     postArticle(params: PostArticleParams): Promise<ArticlePostingMetadata> {
-        const query: Record<string, string> = {}
+        const query: Record<string, string> = {};
         for (const [k, v] of Object.entries(params)) {
-            if (v === undefined || v === null) continue
-            query[k] = Array.isArray(v) ? buildContent(v) : String(v)
+            if (v === undefined || v === null) continue;
+            query[k] = Array.isArray(v) ? buildContent(v) : String(v);
         }
-        return this.http.postEmpty<ArticlePostingMetadata>(`/api/app/article/${this.slug}`, { searchParams: query })
+        return this.http.postEmpty<ArticlePostingMetadata>(`/api/app/article/${this.slug}`, {searchParams: query});
     }
 
     /** 특정 게시글 진입점 */

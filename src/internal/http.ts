@@ -24,7 +24,7 @@ export class Http {
         this.baseUrl = opts.baseUrl ?? DEFAULT_BASE_URL;
         this.userAgent = opts.userAgent ?? DEFAULT_USER_AGENT;
         this.token = opts.token ?? null;
-        this.deviceToken = opts.deviceToken ?? crypto.randomUUID().replaceAll("-", "");
+        this.deviceToken = opts.deviceToken ?? crypto.randomUUID();
 
         this.ky = ky.create({
             baseUrl: this.baseUrl,

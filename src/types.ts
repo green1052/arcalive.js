@@ -260,13 +260,13 @@ export interface ScrapListQuery {
 }
 
 export interface CommentsListQuery {
-    since?: number
-    limit?: number
+    since?: number;
+    limit?: number;
 
-    [key: string]: string | number | undefined
+    [key: string]: string | number | undefined;
 }
 
 export interface ArticlePostingMetadata {
-    slug: string
-    articleId: number
+    slug: string;
+    articleId: number;
 }
