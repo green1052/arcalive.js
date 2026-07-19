@@ -24,9 +24,7 @@ export class Http {
         this.baseUrl = opts.baseUrl ?? DEFAULT_BASE_URL;
         this.userAgent = opts.userAgent ?? DEFAULT_USER_AGENT;
         this.token = opts.token ?? null;
-        // 서버가 빈 X-Device-Token을 403으로 거부. 명세엔 "빈 문자열 허용"이라 했으나 실제 서버는 요구함.
-        // opts.deviceToken이 주어지면 그대로, 아니면 UUID v4 자동 생성.
-        this.deviceToken = opts.deviceToken ?? crypto.randomUUID();
+        this.deviceToken = opts.deviceToken ?? crypto.randomUUID().replaceAll("-", "");
 
         this.ky = ky.create({
             baseUrl: this.baseUrl,

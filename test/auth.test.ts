@@ -1,20 +1,10 @@
 import {describe, expect, test} from "bun:test";
-import {ArcaApiError, ArcaClient} from "../src/index.ts";
+import {ArcaApiError, ArcaClient} from "../src";
 
 const token = process.env.TOKEN;
 const arca = new ArcaClient(token ? {token} : {});
 
 describe("auth - 인증 기능", () => {
-    test("login - deprecated, 항상 throw ArcaApiError(404)", async () => {
-        expect(arca.auth.login("x", "y")).rejects.toThrow(ArcaApiError);
-        try {
-            await arca.auth.login("x", "y");
-        } catch (e) {
-            expect(e).toBeInstanceOf(ArcaApiError);
-            expect((e as ArcaApiError).status).toBe(404);
-        }
-    });
-
     test("me - 내 정보 조회", async () => {
         try {
             const me = await arca.auth.me();

@@ -6,9 +6,7 @@ export class AuthApi {
     constructor(private http: Http) {}
 
     /**
-     * @deprecated 서버 라우트가 v2.280.85 기준 404 not_found_exception.
-     * 공앱에서 추출한 토큰을 `new ArcaClient({ token })`로 주입해서 사용하세요.
-     * 최신 APK 재분석 후 경로가 확인되면 복구 가능.
+     * @deprecated
      */
     async login(_username: string, _password: string): Promise<AuthUser> {
         throw new ArcaApiError(404, {

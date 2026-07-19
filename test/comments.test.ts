@@ -1,5 +1,5 @@
 import {describe, expect, test} from "bun:test";
-import {ArcaApiError, ArcaClient} from "../src/index.ts";
+import {ArcaApiError, ArcaClient} from "../src";
 
 const token = process.env.TOKEN;
 const arca = new ArcaClient(token ? {token} : {});
