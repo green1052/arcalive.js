@@ -9,14 +9,21 @@ import type {
 import {buildContent, type ContentPart} from "../posting.ts";
 import {ArticleApi} from "./article.ts";
 
+/** 게시글 작성 파라미터. */
 export interface PostArticleParams {
     title?: string;
-    /** 본문. string = 그대로 전달, ContentPart[] = buildContent 자동 호출로 JSON 배열 문자열 생성 */
+    /**
+     * 본문. string = 그대로 전달,
+     * ContentPart[] = buildContent 자동 호출로 JSON 배열 문자열 생성.
+     */
     content?: string | ContentPart[];
     category?: string;
+    /** 게시글 edit token (auth token과 별개). */
     token?: string;
+    /** 성인/민감 콘텐츠 플래그 (string으로 전달). */
     isSensitive?: string;
     "g-recaptcha-response"?: string;
+    /** 비회원 게시글 비밀번호. */
     password?: string;
 
     [key: string]: string | ContentPart[] | undefined;

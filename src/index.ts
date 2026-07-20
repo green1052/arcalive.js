@@ -3,6 +3,10 @@ import {AuthApi} from "./api/auth.ts";
 import {ChannelsApi} from "./api/channels.ts";
 import {NotificationsApi} from "./api/notifications.ts";
 
+/**
+ * arca.live 비공식 API 클라이언트.
+ * 각 API 영역(auth/channels/notifications)은 subobject로 노출.
+ */
 export class ArcaClient {
     readonly http: Http;
     readonly auth: AuthApi;

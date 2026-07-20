@@ -6,13 +6,20 @@ export const DEFAULT_BASE_URL = "https://arca.live";
 export const DEFAULT_USER_AGENT = "net.umanle.arca.android/0.9.85";
 
 export interface HttpOptions {
+    /** Base URL. 생략 시 {@link DEFAULT_BASE_URL}. */
     baseUrl?: string;
+    /** User-Agent 헤더. 생략 시 {@link DEFAULT_USER_AGENT}. */
     userAgent?: string;
+    /** Bearer 토큰. null이면 Authorization 헤더 생략. */
     token?: string | null;
+    /** X-Device-Token 헤더. 생략 시 무작위 UUID. 서버 응답 헤더로 갱신됨. */
     deviceToken?: string;
 }
 
-// Internal state container shared across all API subobjects.
+/**
+ * 모든 API subobject가 공유하는 HTTP 상태 컨테이너.
+ * ky 인스턴스를 감싸 인증 헤더 주입, 에러 래핑, 폼/JSON 헬퍼를 제공.
+ */
 export class Http {
     readonly baseUrl: string;
     readonly userAgent: string;

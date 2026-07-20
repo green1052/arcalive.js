@@ -1,9 +1,13 @@
 import type {Http} from "../internal/http.ts";
 import type {Comment} from "../types.ts";
 
+/** 댓글 수정 파라미터. */
 export interface EditCommentParams {
+    /** 본문. */
     content?: string;
+    /** 콘텐츠 타입 (예: "text", "html"). */
     contentType?: string;
+    /** 비밀번호 (비회원 댓글). */
     password?: string;
 
     [key: string]: string | undefined;

@@ -1,5 +1,7 @@
-// DTO types for arca.live unofficial API client.
-// Derived from app-v2-85.apk static analysis (see arca.live/docs/API.md).
+/**
+ * DTO types for arca.live unofficial API client.
+ * Derived from app-v2-85.apk static analysis (see arca.live/docs/API.md).
+ */
 
 export type ChannelSlug = string
 export type ArticleId = number
@@ -23,6 +25,7 @@ export interface User {
     profile_image: string;
 }
 
+/** 사용자 차단(블록) 상태. */
 export interface Block {
     id?: number;
     expiresAt?: string | null;
@@ -30,6 +33,7 @@ export interface Block {
     expired?: string | null;
 }
 
+/** 채널 권한 비트 — 게시/댓글/관리 등. */
 export interface ChannelPermission {
     write?: boolean | null;
     comment?: boolean | null;
@@ -65,16 +69,19 @@ export interface ChannelMeta {
     notificates?: number | null;
 }
 
+/** 채널별 입력 placeholder 텍스트. */
 export interface Placeholder {
     article?: string | null;
     comment?: string | null;
     category?: Record<string, unknown> | null;
 }
 
+/** 통화 단위. */
 export interface CurrencyEntity {
     currency: number;
 }
 
+/** 환율 테이블. */
 export interface ExchangeEntity {
     USD?: CurrencyEntity;
     "100JPY"?: CurrencyEntity;
@@ -92,6 +99,7 @@ export interface ChannelResponse {
     currency?: ExchangeEntity | null;
 }
 
+/** 댓글 첨부(이미지/음성 등). */
 export interface CommentAttachment {
     id: number;
     url: string;
@@ -168,6 +176,7 @@ export interface Article {
     disableNotification?: boolean | null;
 }
 
+/** 게시글 목록 응답. next는 페이지네이션 커서(before/offset). */
 export interface ArticlesResponse {
     articles?: Article[] | null;
     next?: {
@@ -176,6 +185,7 @@ export interface ArticlesResponse {
     };
 }
 
+/** 평가(추천/비추천) 카운트. */
 export interface Rating {
     id: number;
     ratingUp: number;
@@ -184,11 +194,13 @@ export interface Rating {
     ratingDownIp: number;
 }
 
+/** 범용 결과 응답 — result(성공 여부) 또는 id. */
 export interface Result {
     id?: number | null;
     result?: boolean | null;
 }
 
+/** 단일 토큰 응답. */
 export interface TokenBundle {
     token: string;
 }
@@ -225,26 +237,30 @@ export interface Notification {
     comment?: NotificationCommentRef | null;
 }
 
+/** 알림 목록 응답. */
 export interface NotificationBundle {
     notifications: Notification[];
 }
 
+/** 에러 응답 본문. */
 export interface ExceptionResponse {
     message?: string | null;
     result?: boolean | null;
     blocked?: Block | null;
 }
 
+/** 업로드 결과 — idx와 url. */
 export interface UploadResponse {
     idx?: number | null;
     url?: string | null;
 }
 
+/** 이모티콘 id 응답. */
 export interface EmoticonIdBundle {
     emoticonId?: number | null;
 }
 
-// Query params for channel articles listing.
+/** 채널 게시글 목록 쿼리 파라미터. */
 export interface ChannelArticlesQuery {
     mode?: string;
     sort?: string;
@@ -257,6 +273,7 @@ export interface ChannelArticlesQuery {
     [key: string]: string | number | boolean | undefined;
 }
 
+/** 스크랩 목록 쿼리 파라미터. */
 export interface ScrapListQuery {
     p?: number;
     keyword?: string;
@@ -264,6 +281,7 @@ export interface ScrapListQuery {
     [key: string]: string | number | undefined;
 }
 
+/** 댓글 목록 쿼리 파라미터. */
 export interface CommentsListQuery {
     since?: number;
     limit?: number;
@@ -271,6 +289,7 @@ export interface CommentsListQuery {
     [key: string]: string | number | undefined;
 }
 
+/** 게시글 작성 결과 — 생성된 게시글의 slug와 id. */
 export interface ArticlePostingMetadata {
     slug: string;
     articleId: number;

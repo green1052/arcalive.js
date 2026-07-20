@@ -1,6 +1,12 @@
-// Content builder for arca.live article posting.
-// Mirrors ArticleElementTypeConverter.fromModel — 직렬화 포맷은 kotlinx.serialization @Serializable 기준.
+/**
+ * Content builder for arca.live article posting.
+ * Mirrors ArticleElementTypeConverter.fromModel — 직렬화 포맷은 kotlinx.serialization @Serializable 기준.
+ */
 
+/**
+ * 본문 요소. arca.live article element 모델의 discriminated union.
+ * @see buildContent
+ */
 export type ContentPart =
     | { type: "text"; text: string }
     | { type: "html"; tag: string; html: string }
@@ -13,6 +19,7 @@ function uuid(): string {
     return crypto.randomUUID();
 }
 
+/** ContentPart 한 개를 arca.live article element JSON 문자열로 직렬화. */
 function serialize(part: ContentPart): string {
     switch (part.type) {
         case "text":
