@@ -13,7 +13,7 @@ export class NotificationsApi {
     }
 
     /**
-     * GET /api/v2/notifications/mentiond — 멘션 알림 (경로 오타 원본 그대로).
+     * GET /api/v2/notifications/mentiond — 멘션 알림 .
      * @param at 기준 시각(UNIX ms).
      */
     mention(at?: number): Promise<NotificationBundle> {
