@@ -1,5 +1,6 @@
 import type {Http} from "../internal/http.ts";
 import type {
+    Article,
     ArticlePostingMetadata,
     ArticlesResponse,
     ChannelArticlesQuery,
@@ -29,6 +30,25 @@ export interface PostArticleParams {
     [key: string]: string | ContentPart[] | undefined;
 }
 
+/**
+ * ArticlesResponse.next 커서를 따라가며 페이지 단위로 yield.
+ * 클래스 메서드가 아닌 자유 함수 — dtsx가 ambient generator(`*method()`)를 잘못 뱉음(TS1221).
+ */
+async function* paginate<Q extends ChannelArticlesQuery>(
+    fetch: (query: Q) => Promise<ArticlesResponse>,
+    query?: Q
+): AsyncGenerator<Article[]> {
+    let cursor: Record<string, string> | undefined;
+    for (;;) {
+        const res = await fetch({...query, ...cursor} as Q);
+        const page = res.articles ?? [];
+        if (page.length) yield page;
+        // 빈 페이지도 종료 조건 — 커서가 안 움직일 때 무한 루프 방지.
+        if (!res.next || !page.length) return;
+        cursor = res.next;
+    }
+}
+
 export class ChannelApi {
     constructor(private http: Http, readonly slug: string) {}
 
@@ -40,6 +60,16 @@ export class ChannelApi {
     /** GET /api/app/list/channel/{slug} */
     articles(query?: ChannelArticlesQuery): Promise<ArticlesResponse> {
         return this.http.get<ArticlesResponse>(`/api/app/list/channel/${this.slug}`, {searchParams: query});
+    }
+
+    /**
+     * 게시글 목록을 `next` 커서 따라 끝까지 순회. 페이지 단위로 yield.
+     * ```ts
+     * for await (const page of ch.articlePages({limit: 30})) console.log(page.length);
+     * ```
+     */
+    articlePages(query?: ChannelArticlesQuery): AsyncGenerator<Article[]> {
+        return paginate((q) => this.articles(q), query);
     }
 
     /** GET /api/app/list/channel/{slug}/notice */

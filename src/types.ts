@@ -176,13 +176,14 @@ export interface Article {
     disableNotification?: boolean | null;
 }
 
-/** 게시글 목록 응답. next는 페이지네이션 커서(before/offset). */
+/**
+ * 게시글 목록 응답.
+ * next는 페이지네이션 커서 — 그대로 다음 요청 쿼리에 병합.
+ * 채널 목록은 `{before, offset}`이지만 엔드포인트마다 키가 다를 수 있음.
+ */
 export interface ArticlesResponse {
     articles?: Article[] | null;
-    next?: {
-        before: string;
-        offset: string;
-    };
+    next?: Record<string, string> | null;
 }
 
 /** 평가(추천/비추천) 카운트. */

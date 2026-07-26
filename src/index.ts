@@ -1,6 +1,7 @@
 import {Http, type HttpOptions} from "./internal/http.ts";
 import {AuthApi} from "./api/auth.ts";
 import {ChannelsApi} from "./api/channels.ts";
+import {ChannelApi} from "./api/channel.ts";
 import {NotificationsApi} from "./api/notifications.ts";
 
 /**
@@ -37,11 +38,18 @@ export class ArcaClient {
     }
 
     /** 특정 채널 진입 — arca.channel("b") */
-    channel(slug: string) {
+    channel(slug: string): ChannelApi {
         return this.channels.channel(slug);
     }
 }
 
+export {AuthApi} from "./api/auth.ts";
+export {ChannelsApi} from "./api/channels.ts";
+export {ChannelApi, type PostArticleParams} from "./api/channel.ts";
+export {ArticleApi} from "./api/article.ts";
+export {CommentsApi, type PostCommentParams} from "./api/comments.ts";
+export {CommentApi, type EditCommentParams} from "./api/comment.ts";
+export {NotificationsApi} from "./api/notifications.ts";
 export {ArcaApiError} from "./errors.ts";
 export * from "./types.ts";
 export type {HttpOptions} from "./internal/http.ts";

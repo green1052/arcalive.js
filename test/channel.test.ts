@@ -31,6 +31,23 @@ describe("channel(slug) - 채널 기능", () => {
         }
     }, 15000);
 
+    test("articlePages - next 커서 페이지네이션", async () => {
+        try {
+            const ch = arca.channel("bluearchive");
+            const ids: number[] = [];
+            let pages = 0;
+            for await (const page of ch.articlePages({limit: 5})) {
+                expect(page.length).toBeGreaterThan(0);
+                ids.push(...page.map((a) => a.id));
+                if (++pages === 3) break;
+            }
+            expect(new Set(ids).size).toBe(ids.length);
+        } catch (e) {
+            if (e instanceof ArcaApiError) expect(e.status).toBe(403);
+            else throw e;
+        }
+    }, 30000);
+
     test("notice - 채널 공지", async () => {
         try {
             const ch = arca.channel("bluearchive");
