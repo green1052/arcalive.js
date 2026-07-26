@@ -17,7 +17,7 @@ export interface HttpOptions {
     /** Bun 런타임에서 사용할 HTTP/HTTPS 프록시 URL. Node에서는 무시됨. */
     proxy?: string;
     /** Node.js 런타임에서 fetch에 전달할 undici dispatcher (ProxyAgent, EnvHttpProxyAgent 등). Bun에서는 무시됨. */
-    dispatcher?: unknown;
+    dispatcher?: RequestInit["dispatcher"];
 }
 
 /**
@@ -37,16 +37,17 @@ export class Http {
         this.token = opts.token ?? null;
         this.deviceToken = opts.deviceToken ?? crypto.randomUUID();
 
-        const {proxy, dispatcher} = opts;
+        const {proxy} = opts;
         const isBun = typeof process.versions.bun === "string";
-        const proxyFetch = proxy || dispatcher
+        const proxyFetch = proxy && isBun
             ? (input: string | URL | Request, init?: RequestInit) =>
-                fetch(input, {...init, ...(isBun ? {proxy} : {dispatcher})} as RequestInit)
+                fetch(input, {...init, proxy} as RequestInit)
             : undefined;
 
         this.ky = ky.create({
             baseUrl: this.baseUrl,
             fetch: proxyFetch,
+            dispatcher: opts.dispatcher,
             headers: {"User-Agent": this.userAgent},
             hooks: {
                 beforeRequest: [

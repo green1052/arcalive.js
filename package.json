@@ -1,6 +1,6 @@
 {
     "name": "@green-1052/arcalive.js",
-    "version": "0.3.0",
+    "version": "0.3.1",
     "license": "GPL-3.0-only",
     "module": "src/index.ts",
     "exports": {
