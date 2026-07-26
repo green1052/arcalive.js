@@ -14,6 +14,10 @@ export interface HttpOptions {
     token?: string | null;
     /** X-Device-Token 헤더. 생략 시 무작위 UUID. 서버 응답 헤더로 갱신됨. */
     deviceToken?: string;
+    /** Bun 런타임에서 사용할 HTTP/HTTPS 프록시 URL. Node에서는 무시됨. */
+    proxy?: string;
+    /** Node.js 런타임에서 fetch에 전달할 undici dispatcher (ProxyAgent, EnvHttpProxyAgent 등). Bun에서는 무시됨. */
+    dispatcher?: unknown;
 }
 
 /**
@@ -33,8 +37,16 @@ export class Http {
         this.token = opts.token ?? null;
         this.deviceToken = opts.deviceToken ?? crypto.randomUUID();
 
+        const {proxy, dispatcher} = opts;
+        const isBun = typeof process.versions.bun === "string";
+        const proxyFetch = proxy || dispatcher
+            ? (input: string | URL | Request, init?: RequestInit) =>
+                fetch(input, {...init, ...(isBun ? {proxy} : {dispatcher})} as RequestInit)
+            : undefined;
+
         this.ky = ky.create({
             baseUrl: this.baseUrl,
+            fetch: proxyFetch,
             headers: {"User-Agent": this.userAgent},
             hooks: {
                 beforeRequest: [
