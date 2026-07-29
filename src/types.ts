@@ -111,6 +111,7 @@ export interface Comment {
     nickname?: string | null;
     publicId?: number | null;
     createdAt?: string | null;
+    updatedAt?: string | null;
     contentType?: string | null;
     content?: string | null;
     gravatar?: string | null;
