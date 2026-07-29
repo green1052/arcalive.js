@@ -30,7 +30,7 @@ async function* paginateComments(
         if (page.length) yield page;
         // 빈 페이지도 종료 조건 — 커서가 안 움직일 때 무한 루프 방지.
         if (!page.length) return;
-        since = page[page.length - 1].id;
+        since = page[page.length - 1]!.id;
     }
 }
 
