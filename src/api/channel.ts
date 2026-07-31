@@ -8,6 +8,7 @@ import type {
     Result
 } from "../types.ts";
 import {buildContent, type ContentPart} from "../posting.ts";
+import {paginate} from "fetch-extras";
 import {ArticleApi} from "./article.ts";
 
 /** 게시글 작성 파라미터. */
@@ -30,25 +31,6 @@ export interface PostArticleParams {
     [key: string]: string | ContentPart[] | undefined;
 }
 
-/**
- * ArticlesResponse.next 커서를 따라가며 페이지 단위로 yield.
- * 클래스 메서드가 아닌 자유 함수 — dtsx가 ambient generator(`*method()`)를 잘못 뱉음(TS1221).
- */
-async function* paginate<Q extends ChannelArticlesQuery>(
-    fetch: (query: Q) => Promise<ArticlesResponse>,
-    query?: Q
-): AsyncGenerator<Article[]> {
-    let cursor: Record<string, string> | undefined;
-    for (;;) {
-        const res = await fetch({...query, ...cursor} as Q);
-        const page = res.articles ?? [];
-        if (page.length) yield page;
-        // 빈 페이지도 종료 조건 — 커서가 안 움직일 때 무한 루프 방지.
-        if (!res.next || !page.length) return;
-        cursor = res.next;
-    }
-}
-
 export class ChannelApi {
     constructor(private http: Http, readonly slug: string) {}
 
@@ -63,13 +45,26 @@ export class ChannelApi {
     }
 
     /**
-     * 게시글 목록을 `next` 커서 따라 끝까지 순회. 페이지 단위로 yield.
+     * 게시글 목록을 `next` 커서 따라 끝까지 순회. item 단위로 yield.
      * ```ts
-     * for await (const page of ch.articlePages({limit: 30})) console.log(page.length);
+     * for await (const a of ch.articlePages({limit: 30})) console.log(a.id);
      * ```
      */
-    articlePages(query?: ChannelArticlesQuery): AsyncGenerator<Article[]> {
-        return paginate((q) => this.articles(q), query);
+    articlePages(query?: ChannelArticlesQuery): AsyncIterableIterator<Article> {
+        const url = new URL(`/api/app/list/channel/${this.slug}`, this.http.baseUrl);
+        if (query) for (const [k, v] of Object.entries(query)) if (v !== undefined) url.searchParams.set(k, String(v));
+        let cursor: Record<string, string> | undefined;
+        return paginate<Article>(url, {
+            fetchFunction: this.http.ky,
+            pagination: {
+                transform: async (response) => {
+                    const data = await response.json() as ArticlesResponse;
+                    cursor = data.next ?? undefined;
+                    return data.articles ?? [];
+                },
+                paginate: () => cursor ? {url: new URL(`/api/app/list/channel/${this.slug}?${new URLSearchParams(cursor)}`, this.http.baseUrl)} : false,
+            },
+        });
     }
 
     /** GET /api/app/list/channel/{slug}/notice */

@@ -35,11 +35,10 @@ describe("channel(slug) - 채널 기능", () => {
         try {
             const ch = arca.channel("bluearchive");
             const ids: number[] = [];
-            let pages = 0;
-            for await (const page of ch.articlePages({limit: 5})) {
-                expect(page.length).toBeGreaterThan(0);
-                ids.push(...page.map((a) => a.id));
-                if (++pages === 3) break;
+            let count = 0;
+            for await (const a of ch.articlePages({limit: 5})) {
+                ids.push(a.id);
+                if (++count === 15) break;
             }
             expect(new Set(ids).size).toBe(ids.length);
         } catch (e) {
