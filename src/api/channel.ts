@@ -51,10 +51,10 @@ export class ChannelApi {
      * ```
      */
     articlePages(query?: ChannelArticlesQuery): AsyncIterableIterator<Article> {
-        const url = new URL(`/api/app/list/channel/${this.slug}`, this.http.baseUrl);
-        if (query) for (const [k, v] of Object.entries(query)) if (v !== undefined) url.searchParams.set(k, String(v));
+        const baseUrl = new URL(`/api/app/list/channel/${this.slug}`, this.http.baseUrl);
+        if (query) for (const [k, v] of Object.entries(query)) if (v !== undefined) baseUrl.searchParams.set(k, String(v));
         let cursor: Record<string, string> | undefined;
-        return paginate<Article>(url, {
+        return paginate<Article>(baseUrl, {
             fetchFunction: this.http.ky,
             pagination: {
                 transform: async (response) => {
@@ -62,7 +62,12 @@ export class ChannelApi {
                     cursor = data.next ?? undefined;
                     return data.articles ?? [];
                 },
-                paginate: () => cursor ? {url: new URL(`/api/app/list/channel/${this.slug}?${new URLSearchParams(cursor)}`, this.http.baseUrl)} : false,
+                paginate: () => {
+                    if (!cursor) return false;
+                    const nextUrl = new URL(baseUrl);
+                    for (const [k, v] of Object.entries(cursor)) nextUrl.searchParams.set(k, v);
+                    return {url: nextUrl};
+                },
             },
         });
     }

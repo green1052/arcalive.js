@@ -36,10 +36,10 @@ export class CommentsApi {
      * ```
      */
     commentPages(query?: CommentsListQuery): AsyncIterableIterator<Comment> {
-        const url = new URL(`/api/app/list/comment/${this.slug}/${this.articleId}`, this.http.baseUrl);
-        if (query) for (const [k, v] of Object.entries(query)) if (v !== undefined) url.searchParams.set(k, String(v));
+        const baseUrl = new URL(`/api/app/list/comment/${this.slug}/${this.articleId}`, this.http.baseUrl);
+        if (query) for (const [k, v] of Object.entries(query)) if (v !== undefined) baseUrl.searchParams.set(k, String(v));
         let since: number | undefined;
-        return paginate<Comment>(url, {
+        return paginate<Comment>(baseUrl, {
             fetchFunction: this.http.ky,
             pagination: {
                 transform: async (response) => {
@@ -47,7 +47,12 @@ export class CommentsApi {
                     since = items[items.length - 1]?.id;
                     return items;
                 },
-                paginate: () => since ? {url: new URL(`/api/app/list/comment/${this.slug}/${this.articleId}?since=${since}${query?.limit ? `&limit=${query.limit}` : ""}`, this.http.baseUrl)} : false,
+                paginate: () => {
+                    if (!since) return false;
+                    const nextUrl = new URL(baseUrl);
+                    nextUrl.searchParams.set("since", String(since));
+                    return {url: nextUrl};
+                },
             },
         });
     }
