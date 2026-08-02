@@ -51,10 +51,11 @@ export interface Channel {
     name: string;
     slug: string;
     description?: string | null;
-    categories?: string[] | null;
+    categories: string[];
+    categoryData: { id: string; displayName: string }[];
     adTags?: number;
     subscribes?: number | null;
-    modes?: unknown[] | null;
+    modes?: { id: string; name: string }[] | null;
     contentType?: string | null;
     requireCategory?: boolean | null;
 }
