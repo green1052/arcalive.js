@@ -15,9 +15,7 @@ jobs:
 
             -   uses: oven-sh/setup-bun@v2
 
-            -   run: bun install
-
-            -   run: tsc --noEmit
+            -   run: bun ci
 
             -   run: bun run build
 
