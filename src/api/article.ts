@@ -46,6 +46,16 @@ export class ArticleApi {
         return this.http.putQuery(`/api/app/article/${this.slug}/${this.id}/setLive`, {value});
     }
 
+    /** PUT /api/app/article/{slug}/{articleId}/resetRating — 추천/비추천 초기화 (관리자). */
+    resetRating(value: number): Promise<void> {
+        return this.http.putQuery(`/api/app/article/${this.slug}/${this.id}/resetRating`, {value});
+    }
+
+    /** POST /api/app/disableNotification/{slug}/{articleId} — 게시글 알림 끄기. value: 0|1 */
+    disableNotification(value: 0 | 1): Promise<void> {
+        return this.http.postForm(`/api/app/disableNotification/${this.slug}/${this.id}`, {value});
+    }
+
     /** PUT /api/app/article/{slug}/{articleId} — 게시글 수정 (Field: password 필요). 명세 미조사 필드는 TODO. */
     editArticle(params: Record<string, string | number>): Promise<void> {
         return this.http.putForm(`/api/app/article/${this.slug}/${this.id}`, params);

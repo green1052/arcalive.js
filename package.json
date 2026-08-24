@@ -1,6 +1,6 @@
 {
     "name": "@green-1052/arcalive.js",
-    "version": "0.4.3",
+    "version": "0.5.0",
     "license": "GPL-3.0-only",
     "module": "src/index.ts",
     "exports": {
@@ -17,12 +17,15 @@
     "type": "module",
     "scripts": {
         "build": "bun run build.ts",
+        "test": "bun test",
+        "typecheck": "tsc --noEmit",
         "prepublishOnly": "bun run build"
     },
     "repository": "github:green1052/arcalive.js",
     "devDependencies": {
         "@types/bun": "^1.4.0",
-        "bun-plugin-dtsx": "^0.11.10"
+        "bun-plugin-dtsx": "^0.11.10",
+        "typescript": "^7.0.2"
     },
     "dependencies": {
         "fetch-extras": "^3.2.1",

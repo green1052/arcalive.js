@@ -1,19 +1,8 @@
 import type {Http} from "../internal/http.ts";
-import {ArcaApiError} from "../errors.ts";
-import type {AuthUser, Result, TokenBundle, User} from "../types.ts";
+import type {Result, TokenBundle, User} from "../types.ts";
 
 export class AuthApi {
     constructor(private http: Http) {}
-
-    /**
-     * @deprecated
-     */
-    async login(_username: string, _password: string): Promise<AuthUser> {
-        throw new ArcaApiError(404, {
-            result: false,
-            message: "login route deprecated (server 404). inject token via constructor."
-        }, "login route deprecated; inject token via constructor");
-    }
 
     /** POST /api/app/user/logout */
     async logout(): Promise<void> {
@@ -31,13 +20,13 @@ export class AuthApi {
         return this.http.get<TokenBundle>("/api/app/sso-token");
     }
 
-    /** POST /api/app/qrlogin — 이미 로그인된 세션에서 QR 토큰 인증 (Authorization 필요) */
-    qrLoginAuthed(qrToken: string): Promise<Result> {
-        return this.http.postForm<Result>("/api/app/qrlogin", {token: qrToken});
+    /** POST /api/app/push/register — FCM 푸시 토큰 등록. */
+    registerPush(pushToken: string): Promise<void> {
+        return this.http.postForm("/api/app/push/register", {pushToken});
     }
 
-    /** POST /api/app/qrlogin — 미인증 상태에서 QR 토큰으로 로그인 */
-    qrLoginUnauthed(qrToken: string): Promise<Result> {
+    /** POST /api/app/qrlogin — QR 토큰 인증 (로그인/세션 연결 겸용) */
+    qrLogin(qrToken: string): Promise<Result> {
         return this.http.postForm<Result>("/api/app/qrlogin", {token: qrToken});
     }
 }

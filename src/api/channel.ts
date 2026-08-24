@@ -1,14 +1,7 @@
 import type {Http} from "../internal/http.ts";
-import type {
-    Article,
-    ArticlePostingMetadata,
-    ArticlesResponse,
-    ChannelArticlesQuery,
-    ChannelResponse,
-    Result
-} from "../types.ts";
+import {paginateItems} from "../internal/paginate.ts";
+import type {Article, ArticlePostingMetadata, ArticlesResponse, BatchResponse, Block, ChannelArticlesQuery, ChannelResponse, Result} from "../types.ts";
 import {buildContent, type ContentPart} from "../posting.ts";
-import {paginate} from "fetch-extras";
 import {ArticleApi} from "./article.ts";
 
 /** 게시글 작성 파라미터. */
@@ -51,24 +44,9 @@ export class ChannelApi {
      * ```
      */
     articlePages(query?: ChannelArticlesQuery): AsyncIterableIterator<Article> {
-        const baseUrl = new URL(`/api/app/list/channel/${this.slug}`, this.http.baseUrl);
-        if (query) for (const [k, v] of Object.entries(query)) if (v !== undefined) baseUrl.searchParams.set(k, String(v));
-        let cursor: Record<string, string> | undefined;
-        return paginate<Article>(baseUrl, {
-            fetchFunction: this.http.ky,
-            pagination: {
-                transform: async (response) => {
-                    const data = await response.json() as ArticlesResponse;
-                    cursor = data.next ?? undefined;
-                    return data.articles ?? [];
-                },
-                paginate: () => {
-                    if (!cursor) return false;
-                    const nextUrl = new URL(baseUrl);
-                    for (const [k, v] of Object.entries(cursor)) nextUrl.searchParams.set(k, v);
-                    return {url: nextUrl};
-                },
-            },
+        return paginateItems<Article>(this.http, `/api/app/list/channel/${this.slug}`, query, (json) => {
+            const data = json as ArticlesResponse;
+            return {items: data.articles ?? [], next: data.next ?? undefined};
         });
     }
 
@@ -85,6 +63,27 @@ export class ChannelApi {
     /** DELETE /api/app/subscribe/{slug} */
     unsubscribe(): Promise<Result> {
         return this.http.delete<Result>(`/api/app/subscribe/${this.slug}`);
+    }
+
+    /**
+     * POST /api/app/channels/{slug}/users/block — 사용자 차단.
+     * 공앱은 QueryMap으로 전달 (nickname/publicId 등).
+     */
+    blockUser(params: Record<string, string | number>): Promise<Block> {
+        return this.http.postEmpty<Block>(`/api/app/channels/${this.slug}/users/block`, {searchParams: params});
+    }
+
+    /** DELETE /api/app/channels/{slug}/users/block/{blockId} — 차단 해제. */
+    unblockUser(blockId: number): Promise<void> {
+        return this.http.delete(`/api/app/channels/${this.slug}/users/block/${blockId}`);
+    }
+
+    /**
+     * POST /api/app/info/batch/{slug} — 게시글 배치 작업.
+     * QueryMap: 예: {articleIds: "1,2,3", mode: "delete"} — 필드 상세는 공앱 TODO.
+     */
+    batchInfo(params: Record<string, string | number>): Promise<BatchResponse> {
+        return this.http.postEmpty<BatchResponse>(`/api/app/info/batch/${this.slug}`, {searchParams: params});
     }
 
     /**

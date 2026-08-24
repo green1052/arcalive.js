@@ -5,6 +5,19 @@ import type {ExceptionResponse} from "../types.ts";
 export const DEFAULT_BASE_URL = "https://arca.live";
 export const DEFAULT_USER_AGENT = "net.umanle.arca.android/0.9.85";
 
+/** undefined/null 스킵, 배열은 동일 필드명으로 append (Retrofit @Field List와 동일). */
+export type FormValue = string | number | (string | number)[] | undefined | null;
+
+function formBody(form: Record<string, FormValue>): URLSearchParams {
+    const body = new URLSearchParams();
+    for (const [k, v] of Object.entries(form)) {
+        if (v === undefined || v === null) continue;
+        if (Array.isArray(v)) for (const item of v) body.append(k, String(item));
+        else body.set(k, String(v));
+    }
+    return body;
+}
+
 export interface HttpOptions {
     /** Base URL. 생략 시 {@link DEFAULT_BASE_URL}. */
     baseUrl?: string;
@@ -65,14 +78,8 @@ export class Http {
                 beforeError: [
                     async ({error}) => {
                         if (!isHTTPError(error)) return error;
-                        let body: ExceptionResponse | null = null;
-                        try {
-                            body = await error.response.json() as ExceptionResponse;
-                        } catch {
-                            body = null;
-                        }
-                        const msg = body?.message ?? `arca.live API error ${error.response.status}`;
-                        return new ArcaApiError(error.response.status, body, msg);
+                        const body = await error.response.json().catch(() => null) as ExceptionResponse | null;
+                        return new ArcaApiError(error.response.status, body);
                     }
                 ]
             }
@@ -83,14 +90,17 @@ export class Http {
         return this.ky.get<T>(url, opts).json<T>();
     }
 
-    postForm<T>(url: string, form: Record<string, string | number>, opts?: Options): Promise<T> {
-        const body = new URLSearchParams();
-        for (const [k, v] of Object.entries(form)) body.set(k, String(v));
+    postForm<T>(url: string, form: Record<string, FormValue>, opts?: Options): Promise<T> {
         return this.ky.post<T>(url, {
             ...opts,
-            body,
+            body: formBody(form),
             headers: {"Content-Type": "application/x-www-form-urlencoded"}
         }).json<T>();
+    }
+
+    /** POST multipart — FormData 그대로 전달 (Content-Type 자동 설정). */
+    postMultipart<T>(url: string, form: FormData, opts?: Options): Promise<T> {
+        return this.ky.post<T>(url, {...opts, body: form}).json<T>();
     }
 
     postJson<T>(url: string, json?: unknown, opts?: Options): Promise<T> {
@@ -101,17 +111,12 @@ export class Http {
         return this.ky.post<T>(url, opts).json<T>();
     }
 
-    putForm<T = void>(url: string, form?: Record<string, string | number>, opts?: Options): Promise<T> {
-        if (form) {
-            const body = new URLSearchParams();
-            for (const [k, v] of Object.entries(form)) body.set(k, String(v));
-            return this.ky.put<T>(url, {
-                ...opts,
-                body,
-                headers: {"Content-Type": "application/x-www-form-urlencoded"}
-            }).json<T>();
-        }
-        return this.ky.put<T>(url, opts).json<T>();
+    putForm<T = void>(url: string, form: Record<string, FormValue>, opts?: Options): Promise<T> {
+        return this.ky.put<T>(url, {
+            ...opts,
+            body: formBody(form),
+            headers: {"Content-Type": "application/x-www-form-urlencoded"}
+        }).json<T>();
     }
 
     putQuery<T = void>(url: string, searchParams?: Record<string, string | number | boolean>, opts?: Options): Promise<T> {

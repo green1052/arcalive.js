@@ -26,9 +26,9 @@ describe("auth - 인증 기능", () => {
         }
     }, 15000);
 
-    test("qrLoginUnauthed - 미인증 QR 로그인 (가짜 토큰)", async () => {
+    test("qrLogin - QR 토큰 인증 (가짜 토큰)", async () => {
         try {
-            const res = await arca.auth.qrLoginUnauthed("invalidtoken");
+            const res = await arca.auth.qrLogin("invalidtoken");
             expect(res).toBeDefined();
         } catch (e) {
             if (e instanceof ArcaApiError) expect([400, 401, 403, 404]).toContain(e.status);

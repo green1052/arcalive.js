@@ -19,7 +19,7 @@ describe("comments - 댓글 기능", () => {
         }
     }, 15000);
 
-    test("create + item(id).edit (토큰 필요, 실제 쓰기)", async () => {
+    test("create + edit (토큰 필요, 실제 쓰기)", async () => {
         if (!token) return; // 쓰기 테스트는 토큰 있을 때만
         try {
             const ch = arca.channel("bluearchive");
@@ -29,7 +29,7 @@ describe("comments - 댓글 기능", () => {
             const comments = ch.article(first.id).comments();
             const created = await comments.create({content: "test 댓글 (자동화)"});
             if (created.id) {
-                await comments.item(created.id).edit({content: "test 댓글 수정"});
+                await comments.edit(created.id, {content: "test 댓글 수정"});
             }
         } catch (e) {
             if (e instanceof ArcaApiError) expect([400, 401, 403, 404]).toContain(e.status);

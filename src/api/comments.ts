@@ -1,7 +1,6 @@
 import type {Http} from "../internal/http.ts";
+import {paginateItems} from "../internal/paginate.ts";
 import type {Comment, CommentsListQuery} from "../types.ts";
-import {paginate} from "fetch-extras";
-import {CommentApi} from "./comment.ts";
 
 /** 댓글 작성 파라미터. */
 export interface PostCommentParams {
@@ -15,6 +14,18 @@ export interface PostCommentParams {
     parentId?: number;
 
     [key: string]: string | number | undefined;
+}
+
+/** 댓글 수정 파라미터. */
+export interface EditCommentParams {
+    /** 본문. */
+    content?: string;
+    /** 콘텐츠 타입 (예: "text", "html"). */
+    contentType?: string;
+    /** 비밀번호 (비회원 댓글). */
+    password?: string;
+
+    [key: string]: string | undefined;
 }
 
 export class CommentsApi {
@@ -36,36 +47,25 @@ export class CommentsApi {
      * ```
      */
     commentPages(query?: CommentsListQuery): AsyncIterableIterator<Comment> {
-        const baseUrl = new URL(`/api/app/list/comment/${this.slug}/${this.articleId}`, this.http.baseUrl);
-        if (query) for (const [k, v] of Object.entries(query)) if (v !== undefined) baseUrl.searchParams.set(k, String(v));
-        let since: number | undefined;
-        return paginate<Comment>(baseUrl, {
-            fetchFunction: this.http.ky,
-            pagination: {
-                transform: async (response) => {
-                    const items = await response.json() as Comment[];
-                    since = items[items.length - 1]?.id;
-                    return items;
-                },
-                paginate: () => {
-                    if (!since) return false;
-                    const nextUrl = new URL(baseUrl);
-                    nextUrl.searchParams.set("since", String(since));
-                    return {url: nextUrl};
-                },
-            },
+        return paginateItems<Comment>(this.http, `/api/app/list/comment/${this.slug}/${this.articleId}`, query, (json) => {
+            const items = json as Comment[];
+            const last = items[items.length - 1];
+            return {items, next: last ? {since: String(last.id)} : undefined};
         });
     }
 
     /** POST /api/app/comment/{slug}/{articleId} */
     create(params: PostCommentParams): Promise<Comment> {
-        const form: Record<string, string | number> = {};
-        for (const [k, v] of Object.entries(params)) if (v !== undefined) form[k] = v;
-        return this.http.postForm<Comment>(`/api/app/comment/${this.slug}/${this.articleId}`, form);
+        return this.http.postForm<Comment>(`/api/app/comment/${this.slug}/${this.articleId}`, params);
     }
 
-    /** 특정 댓글 진입점 */
-    item(commentId: number): CommentApi {
-        return new CommentApi(this.http, this.slug, this.articleId, commentId);
+    /** PUT /api/app/comment/{slug}/{articleId}/{commentId} — 댓글 수정 */
+    edit(commentId: number, params: EditCommentParams): Promise<Comment> {
+        return this.http.putForm<Comment>(`/api/app/comment/${this.slug}/${this.articleId}/${commentId}`, params);
+    }
+
+    /** POST /api/app/disableNotification/{slug}/{articleId}/{commentId} — 댓글 알림 끄기. value: 0|1 */
+    disableNotification(commentId: number, value: 0 | 1): Promise<void> {
+        return this.http.postForm(`/api/app/disableNotification/${this.slug}/${this.articleId}/${commentId}`, {value});
     }
 }

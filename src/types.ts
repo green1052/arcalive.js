@@ -3,19 +3,6 @@
  * Derived from app-v2-85.apk static analysis (see arca.live/docs/API.md).
  */
 
-export type ChannelSlug = string
-export type ArticleId = number
-export type CommentId = number
-
-export interface AuthUser {
-    username: string;
-    nickname: string;
-    publicId?: number | null;
-    point: number;
-    token: string;
-    profile_image?: string | null;
-}
-
 export interface User {
     username: string;
     nickname: string;
@@ -164,9 +151,9 @@ export interface Article {
     isNotice?: boolean | null;
     isBestBlock?: boolean | null;
     isLive?: boolean | null;
-    vote?: unknown[] | null;
+    vote?: Vote[] | null;
     editor?: string | null;
-    notice?: unknown | null;
+    notice?: AppNotice | null;
     deal?: unknown | null;
     blockPreview?: boolean | null;
     isSpoilerAlert?: boolean | null;
@@ -174,7 +161,7 @@ export interface Article {
     mark?: "image" | "best" | string | null;
     rateValue?: number | null;
     isRelay?: boolean | null;
-    liveConfig?: unknown | null;
+    liveConfig?: LiveConfig | null;
     disableNotification?: boolean | null;
 }
 
@@ -252,15 +239,122 @@ export interface ExceptionResponse {
     blocked?: Block | null;
 }
 
+/** 게시글 첨부 투표 정보. */
+export interface Vote {
+    title?: string | null;
+    uuid?: string | null;
+    expired?: boolean | null;
+    uri?: string | null;
+    webtoken?: string | null;
+}
+
+/** 투표 생성 응답. */
+export interface VoteResponse {
+    voteId: string;
+}
+
+/** 라이브 콤보 이모티콘 설정. */
+export interface LiveConfigComboEmoticon {
+    enable: boolean;
+    max: number;
+}
+
+export interface LiveConfig {
+    comboEmoticon?: LiveConfigComboEmoticon | null;
+}
+
+/** 앱 버전 응답 — result(버전 문자열), url(업데이트 링크). */
+export interface Version {
+    result: string;
+    url?: string | null;
+}
+
+/** 서비스 공지. */
+export interface AppNotice {
+    text: string;
+    href?: string | null;
+    /** Gson @SerializedName("class"). */
+    class?: string | null;
+    /** Gson @SerializedName("type"). */
+    type?: string | null;
+}
+
+/** GET /api/notice 응답. */
+export interface NoticeResponse {
+    notice: AppNotice;
+}
+
+/** 뉴스 항목. */
+export interface NewsArticle {
+    title: string;
+    link: string;
+}
+
+/** GET /api/bywiki.json 응답. */
+export interface NewsBundle {
+    articles: NewsArticle[];
+}
+
+export interface Emoticon {
+    id: number;
+    imageUrl?: string | null;
+}
+
+export interface EmoticonSet {
+    id: number;
+    thumbnail?: string | null;
+}
+
+/** 첨부파일 → 이모티콘 id 응답. */
+export interface EmoticonIdBundle {
+    emoticonId?: number | null;
+}
+
 /** 업로드 결과 — idx와 url. */
 export interface UploadResponse {
     idx?: number | null;
     url?: string | null;
 }
 
-/** 이모티콘 id 응답. */
-export interface EmoticonIdBundle {
-    emoticonId?: number | null;
+/** 채널 배치 작업 응답. */
+export interface BatchResponse {
+    success?: Result[] | null;
+    failed?: Result[] | null;
+}
+
+export interface RecentArticle {
+    id: number;
+    title: string;
+    commentCount: number;
+    boardName?: string | null;
+    createdAt?: string | null;
+    slug?: string | null;
+}
+
+export interface RecentComment {
+    id: number;
+    slug?: string | null;
+    articleId?: number | null;
+    contentType?: string | null;
+    content?: string | null;
+    image?: string | null;
+    attachmentId?: number | null;
+    createdAt?: string | null;
+    boardName?: string | null;
+}
+
+export interface UserProfile {
+    backgroundImage?: string | null;
+    description?: string | null;
+    profileImage?: string | null;
+}
+
+/** GET /api/app/users/recent 응답 — 최근 활동. */
+export interface RecentBundle {
+    activityTiles?: Record<string, string>[][] | null;
+    articles?: RecentArticle[] | null;
+    comments?: RecentComment[] | null;
+    userprofile?: UserProfile | null;
 }
 
 /** 채널 게시글 목록 쿼리 파라미터. */

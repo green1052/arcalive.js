@@ -15,25 +15,22 @@ export type ContentPart =
     | { type: "emoticon"; emoticonUrl: string }
     | { type: "emoticons"; emoticonUrls: string[] }
 
-function uuid(): string {
-    return crypto.randomUUID();
-}
-
 /** ContentPart 한 개를 arca.live article element JSON 문자열로 직렬화. */
 function serialize(part: ContentPart): string {
+    const uuid = crypto.randomUUID();
     switch (part.type) {
         case "text":
             // TextArticleElement — showPlaceholder/focused=false 생략, text는 TextFieldValueSerializer가 문자열만 인코딩
-            return JSON.stringify({text: part.text, uuid: uuid()});
+            return JSON.stringify({text: part.text, uuid});
         case "html":
             // HtmlArticleElement
-            return JSON.stringify({tag: part.tag, html: part.html, uuid: uuid()});
+            return JSON.stringify({tag: part.tag, html: part.html, uuid});
         case "media": {
             // RemoteMediaArticleElement — width/height=0이면 생략
             const o: Record<string, unknown> = {url: part.url, tag: part.tag};
             if (part.width) o.width = part.width;
             if (part.height) o.height = part.height;
-            o.uuid = uuid();
+            o.uuid = uuid;
             return JSON.stringify(o);
         }
         case "videoLink":
@@ -43,14 +40,14 @@ function serialize(part: ContentPart): string {
                 description: part.description ?? null,
                 imageUrl: part.imageUrl ?? null,
                 html: part.html ?? null,
-                uuid: uuid()
+                uuid
             });
         case "emoticon":
             // EmoticonArticleElement
-            return JSON.stringify({emoticonUrl: part.emoticonUrl, uuid: uuid()});
+            return JSON.stringify({emoticonUrl: part.emoticonUrl, uuid});
         case "emoticons":
             // EmoticonsArticleElement
-            return JSON.stringify({emoticonUrls: part.emoticonUrls, uuid: uuid()});
+            return JSON.stringify({emoticonUrls: part.emoticonUrls, uuid});
     }
 }
 
