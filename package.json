@@ -23,7 +23,7 @@
     },
     "repository": "github:green1052/arcalive.js",
     "devDependencies": {
-        "@types/bun": "^1.4.1",
+        "@types/bun": "^1.4.2",
         "bun-plugin-dtsx": "^0.11.10",
         "typescript": "^7.0.2"
     },
