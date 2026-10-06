@@ -1,6 +1,6 @@
 # arcalive.js
 
-[arca.live](https://arca.live) 비공식 API 클라이언트 — 공식 Android 앱(v2.85) 프로토콜을 역분석해 재현한 TypeScript 라이브러리.
+[arca.live](https://arca.live) 비공식 API 클라이언트
 
 ## 설치
 
