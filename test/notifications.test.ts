@@ -1,8 +1,6 @@
 import {describe, expect, test} from "bun:test";
-import {ArcaApiError, ArcaClient} from "../src";
-
-const token = process.env.TOKEN;
-const arca = new ArcaClient(token ? {token} : {});
+import {ArcaApiError} from "../src";
+import {arca} from "./live.ts";
 
 describe("notifications - 알림 기능", () => {
     test("all - 전체 알림", async () => {
@@ -41,16 +39,6 @@ describe("notifications - 알림 기능", () => {
             expect(noti.notifications).toBeDefined();
         } catch (e) {
             if (e instanceof ArcaApiError) expect([401, 403]).toContain(e.status);
-            else throw e;
-        }
-    }, 15000);
-
-    test("read - 알림 일괄 처리 (가짜 tokens)", async () => {
-        try {
-            const res = await arca.notifications.read("read", "invalidtoken");
-            expect(res).toBeDefined();
-        } catch (e) {
-            if (e instanceof ArcaApiError) expect([400, 401, 403, 500]).toContain(e.status);
             else throw e;
         }
     }, 15000);

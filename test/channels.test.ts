@@ -1,8 +1,6 @@
 import {describe, expect, test} from "bun:test";
-import {ArcaApiError, ArcaClient} from "../src";
-
-const token = process.env.TOKEN;
-const arca = new ArcaClient(token ? {token} : {});
+import {ArcaApiError} from "../src";
+import {arca} from "./live.ts";
 
 describe("channels (인증 불필요)", () => {
     test("list - 채널 목록 조회", async () => {

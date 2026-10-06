@@ -9,7 +9,11 @@ export interface User {
     publicId?: number | null;
     point?: number | null;
     token?: string | null;
-    profile_image: string;
+    profile_image?: string | null;
+    uuid?: string | null;
+    /** 광고 태그 구독 마스크 (실측: sexual/sensitive/taste/society/d2/horror). */
+    ad_tags?: Record<string, boolean> | null;
+    mute?: {users?: string[]; keywords?: string[]} | null;
 }
 
 /** 사용자 차단(블록) 상태. */
@@ -303,6 +307,9 @@ export interface Emoticon {
 export interface EmoticonSet {
     id: number;
     thumbnail?: string | null;
+    /** 세트 이름 (실측: 첫 세트 id=0 "최근 사용"). */
+    title?: string | null;
+    count?: number;
 }
 
 /** 첨부파일 → 이모티콘 id 응답. */

@@ -1,4 +1,4 @@
-import type {Http} from "../internal/http.ts";
+import {form, type Http} from "../internal/http.ts";
 import type {NewsBundle, NoticeResponse, UploadResponse, Version, VoteResponse} from "../types.ts";
 
 /** 투표 생성 파라미터. */
@@ -30,22 +30,22 @@ export class MiscApi {
 
     /** GET /api/v2/version — 최신 앱 버전. */
     version(): Promise<Version> {
-        return this.http.get<Version>("/api/v2/version");
+        return this.http.api.get("/api/v2/version").json<Version>();
     }
 
     /** GET /api/notice — 서비스 공지. */
     notice(): Promise<NoticeResponse> {
-        return this.http.get<NoticeResponse>("/api/notice");
+        return this.http.api.get("/api/notice").json<NoticeResponse>();
     }
 
     /** GET /api/bywiki.json — 뉴스. */
     news(): Promise<NewsBundle> {
-        return this.http.get<NewsBundle>("/api/bywiki.json");
+        return this.http.api.get("/api/bywiki.json").json<NewsBundle>();
     }
 
     /** POST /app/api/create_vote — 투표 생성. 항목은 vote_items 필드로 반복 인코딩. */
     createVote(params: CreateVoteParams): Promise<VoteResponse> {
-        return this.http.postForm<VoteResponse>("/app/api/create_vote", {
+        return this.http.api.post("/app/api/create_vote", form({
             voteTitle: params.title,
             vote_items: params.items,
             multiSelectLimit: params.multiSelectLimit,
@@ -53,7 +53,7 @@ export class MiscApi {
             expire_day: params.expireDay,
             expire_hour: params.expireHour,
             expire_min: params.expireMin,
-        });
+        })).json<VoteResponse>();
     }
 
     /**
@@ -65,6 +65,6 @@ export class MiscApi {
         form.set("token", params.token);
         form.set("upload", file, params.filename ?? "upload");
         form.set("purpose", params.purpose);
-        return this.http.postMultipart<UploadResponse>("/api/app/upload", form);
+        return this.http.api.post("/api/app/upload", {body: form}).json<UploadResponse>();
     }
 }

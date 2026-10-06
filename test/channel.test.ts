@@ -1,13 +1,11 @@
 import {describe, expect, test} from "bun:test";
-import {ArcaApiError, ArcaClient} from "../src";
+import {ArcaApiError} from "../src";
+import {arca, slug} from "./live.ts";
 
-const token = process.env.TOKEN;
-const arca = new ArcaClient(token ? {token} : {});
-
-describe("channel(slug) - 채널 기능", () => {
+describe.skipIf(!slug)("channel(slug) - 채널 기능", () => {
     test("articles - b 채널 게시글 목록", async () => {
         try {
-            const ch = arca.channel("bluearchive");
+            const ch = arca.channel(slug);
             const res = await ch.articles({limit: 5});
             expect(res.articles).toBeDefined();
         } catch (e) {
@@ -18,7 +16,7 @@ describe("channel(slug) - 채널 기능", () => {
 
     test("article(id).view - 게시글 상세조회", async () => {
         try {
-            const ch = arca.channel("bluearchive");
+            const ch = arca.channel(slug);
             const list = await ch.articles({limit: 1});
             const first = list.articles?.[0];
             if (!first) return;
@@ -33,7 +31,7 @@ describe("channel(slug) - 채널 기능", () => {
 
     test("articlePages - next 커서 페이지네이션", async () => {
         try {
-            const ch = arca.channel("bluearchive");
+            const ch = arca.channel(slug);
             const ids: number[] = [];
             let count = 0;
             for await (const a of ch.articlePages({limit: 5})) {
@@ -49,7 +47,7 @@ describe("channel(slug) - 채널 기능", () => {
 
     test("notice - 채널 공지", async () => {
         try {
-            const ch = arca.channel("bluearchive");
+            const ch = arca.channel(slug);
             const res = await ch.notice();
             expect(res.articles).toBeDefined();
         } catch (e) {
