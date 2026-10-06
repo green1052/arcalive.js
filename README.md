@@ -9,7 +9,7 @@ bun add @green-1052/arcalive.js
 # 또는 npm i @green-1052/arcalive.js
 ```
 
-런타임: Bun / Node.js 18+. 의존성: ky.
+런타임: Bun / Node.js 22+ (ky 2 요구사항). 의존성: ky.
 
 ## 토큰
 
@@ -93,6 +93,7 @@ await arca.reports.submit("article", articleId, {
   new ArcaClient({fetch: curlImpersonateFetch}); // (input, init) => Promise<Response>
   ```
 - **아카콘 댓글**: 계정에 이모티콘 권한이 필요합니다 (권한 없으면 403).
+- **에러/재시도**: API 실패는 `ArcaApiError`(`status`, `response`)로 throw되며 자동 재시도는 없습니다. 기본 타임아웃은 10초 — 큰 파일 업로드는 `new ArcaClient({timeout: 60_000})`처럼 늘리세요.
 
 ## API 영역
 

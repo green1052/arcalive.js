@@ -18,7 +18,8 @@ export async function* paginateItems<T>(
     for (;;) {
         const {items, next} = parse(await http.api.get(path, {searchParams: {...query, ...cursor}}).json());
         yield* items;
-        if (!next || Object.keys(next).length === 0) return;
+        // 커서가 없거나 직전과 같으면 종료 (서버가 같은 커서를 반복하면 무한 요청 방지)
+        if (!next || Object.keys(next).length === 0 || JSON.stringify(next) === JSON.stringify(cursor)) return;
         cursor = next;
     }
 }

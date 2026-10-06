@@ -83,4 +83,4 @@ export {UsersApi, type RecentQuery} from "./api/users.ts";
 export {ReportsApi, type ReportTarget, type ReportForm, type SubmitReportParams} from "./api/reports.ts";
 export {ArcaApiError} from "./errors.ts";
 export * from "./types.ts";
-export type {HttpOptions} from "./internal/http.ts";
+export type {Http, HttpOptions} from "./internal/http.ts";

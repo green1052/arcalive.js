@@ -11,8 +11,8 @@ export class ArcaApiError extends Error {
     /** 파싱된 에러 응답 본문. 본문이 없거나 JSON이 아니면 null. */
     readonly response: ExceptionResponse | null;
 
-    constructor(status: number, response: ExceptionResponse | null, message?: string) {
-        super(message ?? response?.message ?? `arca.live API error ${status}`);
+    constructor(status: number, response: ExceptionResponse | null) {
+        super(response?.message ?? `arca.live API error ${status}`);
         this.name = "ArcaApiError";
         this.status = status;
         this.response = response;

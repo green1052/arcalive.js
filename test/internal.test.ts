@@ -127,6 +127,27 @@ describe("paginate - 커서 순회", () => {
         expect(m.calls[1]!.url).toContain("before=9");
         expect(m.calls).toHaveLength(2);
     });
+
+    test("같은 커서 반복 시 종료 (무한 요청 방지)", async () => {
+        const m = mockFetch(() => ({body: JSON.stringify({articles: [{id: 1}], next: {before: "1"}})}));
+        const http = new Http({fetch: m.fn});
+        const ids: number[] = [];
+        for await (const a of paginateItems(http, "/x", undefined, json => {
+            const p = json as {articles: {id: number}[]; next: Record<string, string>};
+            return {items: p.articles, next: p.next};
+        })) ids.push(a.id);
+        expect(m.calls).toHaveLength(2);
+        expect(ids).toEqual([1, 1]);
+    });
+});
+
+describe("http - timeout", () => {
+    test("timeout 옵션 적용", async () => {
+        const slow = () => new Promise<Response>(r => setTimeout(() => r(new Response("{}")), 200));
+        const http = new Http({fetch: slow, timeout: 50});
+        const err = await http.api.get("/x").json().catch(e => e);
+        expect((err as Error).name).toBe("TimeoutError");
+    });
 });
 
 describe("webform - 파서", () => {

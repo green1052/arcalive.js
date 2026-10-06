@@ -1,6 +1,6 @@
 /**
  * DTO types for arca.live unofficial API client.
- * Derived from app-v2-85.apk static analysis (see arca.live/docs/API.md).
+ * Derived from app-v2-85.apk static analysis.
  */
 
 export interface User {

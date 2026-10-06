@@ -28,6 +28,8 @@ export interface HttpOptions {
     token?: string | null;
     /** X-Device-Token 헤더. 생략 시 무작위 UUID. 서버 응답 헤더로 갱신됨. */
     deviceToken?: string;
+    /** 요청 타임아웃(ms). false면 무제한. 생략 시 ky 기본 10초 — 큰 파일 업로드 시 늘릴 것. */
+    timeout?: number | false;
     /** Bun 런타임에서 사용할 HTTP/HTTPS 프록시 URL. Node에서는 무시됨. */
     proxy?: string;
     /** Node.js 런타임에서 fetch에 전달할 undici dispatcher (ProxyAgent, EnvHttpProxyAgent 등). Bun에서는 무시됨. */
@@ -83,6 +85,7 @@ export class Http {
         const base = ky.create({
             prefix: opts.baseUrl ?? DEFAULT_BASE_URL,
             retry: 0,
+            timeout: opts.timeout,
             // Bun 전용 proxy — 커스텀 fetch와 함께 지정해도 둘 다 적용
             fetch: proxy && typeof process.versions.bun === "string"
                 ? (input: string | URL | Request, init?: RequestInit) => baseFetch(input, {...init, proxy} as RequestInit)
