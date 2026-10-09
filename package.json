@@ -29,6 +29,6 @@
         "typescript": "^7.0.2"
     },
     "dependencies": {
-        "ky": "^2.1.0"
+        "ky": "^2.2.0"
     }
 }
