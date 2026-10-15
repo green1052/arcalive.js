@@ -88,10 +88,13 @@ await arca.reports.submit("article", articleId, {
 ## 제약
 
 - **추천/비추천** (`rate`): 유효한 reCAPTCHA 토큰 필요 — 헤드리스로는 불가 (405 응답 실측).
-- **Cloudflare**: 신고/글쓰기 등 HTML 페이지 요청(웹 폼 플로우)은 fetch 계열 TLS 지문이 간헐적으로 챌린지에 걸립니다. 세션 쿠키를 캐시해 재요청을 최소화하지만, 차단 시 브라우저 유사 fetch를 주입하세요:
-  ```ts
-  new ArcaClient({fetch: curlImpersonateFetch}); // (input, init) => Promise<Response>
-  ```
+- **Cloudflare**: 신고/글쓰기 등 HTML 페이지 요청(웹 폼 플로우)은 Cloudflare 챌린지 대상입니다.
+  - **Bun**: 별도 설정 없이 동작합니다. Cloudflare는 HTTP/1.1 요청에서 `Host` 헤더가 `User-Agent`보다 뒤에 오면 챌린지를 거는데(TLS 지문과 무관, 실측), Bun fetch는 기본적으로 `Host`를 뒤에 붙이므로 라이브러리가 `Host`를 직접 지정해 앞으로 보냅니다 (RFC 9112 §3.2 권고 순서).
+  - **Node**: 기본 fetch(undici)는 챌린지에 걸립니다. 웹 폼 기능을 쓰려면 통과하는 fetch를 주입하세요:
+    ```ts
+    new ArcaClient({fetch: customFetch}); // (input, init) => Promise<Response>
+    ```
+  - `User-Agent`가 브라우저/공앱 형식이 아니면(`curl/…`, `Mozilla/5.0`만, 빈 값 등) 챌린지에 걸립니다 — 웹 요청 UA는 기본값(공앱 WebView)을 유지하세요.
 - **아카콘 댓글**: 계정에 이모티콘 권한이 필요합니다 (권한 없으면 403).
 - **에러/재시도**: API 실패는 `ArcaApiError`(`status`, `response`)로 throw되며 자동 재시도는 없습니다. 기본 타임아웃은 10초 — 큰 파일 업로드는 `new ArcaClient({timeout: 60_000})`처럼 늘리세요.
 

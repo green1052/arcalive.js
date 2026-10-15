@@ -63,6 +63,14 @@ describe("http - 목업 fetch 동작", () => {
         expect(m.calls[0]!.headers.get("User-Agent")).toContain("Mozilla");
     });
 
+    test("Bun — api/web 모두 Host 명시 (Cloudflare 헤더 순서 보정), baseUrl 호스트 사용", async () => {
+        const m = mockFetch(() => ({body: "{}"}));
+        const http = new Http({fetch: m.fn, baseUrl: "https://proxy.example:8443/arca"});
+        await http.api.get("/x").json();
+        await http.web.get("/y");
+        expect(m.calls.map(c => c.headers.get("Host"))).toEqual(["proxy.example:8443", "proxy.example:8443"]);
+    });
+
     test("JSON 에러 → ArcaApiError (본문 파싱)", async () => {
         const m = mockFetch(() => ({status: 403, body: JSON.stringify({result: false, message: "권한이 없습니다."})}));
         const http = new Http({fetch: m.fn});

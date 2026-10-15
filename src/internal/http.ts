@@ -35,9 +35,10 @@ export interface HttpOptions {
     /** Node.js 런타임에서 fetch에 전달할 undici dispatcher (ProxyAgent, EnvHttpProxyAgent 등). Bun에서는 무시됨. */
     dispatcher?: RequestInit["dispatcher"];
     /**
-     * 커스텀 fetch 구현 (curl-impersonate, got-scraping 등).
-     * 웹 폼 플로우(신고/글쓰기)는 HTML 페이지 요청이라 fetch 계열 TLS 지문이
-     * Cloudflare 챌린지에 간헐적으로 걸릴 때 브라우저 유사 fetch로 우회.
+     * 커스텀 fetch 구현.
+     * 웹 폼 플로우(신고/글쓰기)는 HTML 페이지 요청이라 Cloudflare 챌린지 대상.
+     * Bun은 Host 헤더 순서 보정으로 통과하지만, Node 기본 fetch(undici)는
+     * 챌린지에 걸리므로(실측) Node에서 웹 폼을 쓰려면 지정할 것.
      */
     fetch?: (input: string | URL | Request, init?: RequestInit) => Promise<Response>;
 }
@@ -82,16 +83,23 @@ export class Http {
         this.deviceToken = opts.deviceToken ?? crypto.randomUUID();
 
         const {proxy, fetch: baseFetch = fetch} = opts;
+        const isBun = typeof process.versions.bun === "string";
         const base = ky.create({
             prefix: opts.baseUrl ?? DEFAULT_BASE_URL,
             retry: 0,
             timeout: opts.timeout,
             // Bun 전용 proxy — 커스텀 fetch와 함께 지정해도 둘 다 적용
-            fetch: proxy && typeof process.versions.bun === "string"
+            fetch: proxy && isBun
                 ? (input: string | URL | Request, init?: RequestInit) => baseFetch(input, {...init, proxy} as RequestInit)
                 : opts.fetch,
             dispatcher: opts.dispatcher,
             hooks: {
+                // Bun fetch는 사용자 헤더를 이름순 정렬한 뒤 Host를 맨 뒤쪽(User-Agent 뒤)에 붙이는데,
+                // Cloudflare는 HTML 페이지 요청에서 Host가 User-Agent보다 뒤면 챌린지를 건다 (실측, TLS 지문 무관).
+                // Host를 직접 지정하면 이름순으로 user-agent 앞에 놓여 통과. RFC 9112 §3.2도 Host를 첫 헤더로 권고.
+                beforeRequest: isBun ? [({request}) => {
+                    request.headers.set("Host", new URL(request.url).host);
+                }] : [],
                 afterResponse: [({response}) => {
                     const dt = response.headers.get("X-Device-Token");
                     if (dt) this.deviceToken = dt;

@@ -50,7 +50,7 @@ function parseForm(html: string, target: ReportTarget, targetId: number): Report
  * 3. GET 폼 페이지 → _csrf/hidden 필드/카테고리 파싱 (카테고리는 채널별로 다름)
  * 4. POST /app-webview/reports/submit
  *
- * 주의: HTML 페이지 요청이라 Cloudflare 챌린지에 걸릴 수 있음 (fetch 계열은 간헐적 차단 관찰).
+ * 주의: HTML 페이지 요청이라 Cloudflare 챌린지 대상 — Node 기본 fetch는 차단됨, `HttpOptions.fetch` 참고.
  * 실패 시 ArcaApiError — 409=이미 신고, 429=레이트리밋, 기타=폼 메시지 추출.
  */
 export class ReportsApi {

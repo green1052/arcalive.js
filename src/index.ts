@@ -26,7 +26,7 @@ import {ReportsApi} from "./api/reports.ts";
  *
  * 토큰은 로그인 시 서버가 발급하는 Bearer 토큰(PREFS_LAST_USER_TOKEN).
  * 신고(reports)/글쓰기(postArticle)는 WebView 웹 폼 플로우 재현으로
- * SSO 세션을 자동 발급한다 — 간헐적 Cloudflare 챌린지는 `HttpOptions.fetch`로 우회.
+ * SSO 세션을 자동 발급한다 — Node에서는 Cloudflare 챌린지 때문에 `HttpOptions.fetch` 지정 필요.
  */
 export class ArcaClient {
     readonly http: Http;

@@ -6,8 +6,8 @@
  * 2. `GET /sso?goto={path}&token={sso}` → 302 + 세션 쿠키(`arca.at`, `arca.at.sig`)
  * 3. `GET {path}` + 쿠키 → 인증된 HTML 폼 (_csrf/hidden 필드 파싱)
  *
- * 주의: HTML 페이지 요청이라 fetch 계열 TLS/헤더 지문이 Cloudflare 챌린지에
- * 간헐적으로 걸림 — `HttpOptions.fetch`로 브라우저 유사 fetch 주입해 우회 가능.
+ * 주의: HTML 페이지 요청이라 Cloudflare 챌린지 대상. Bun은 Http의 Host 헤더 순서 보정으로 통과,
+ * Node 기본 fetch는 차단됨 — `HttpOptions.fetch` 참고.
  */
 import {form, type FormValue, type Http} from "./http.ts";
 import type {TokenBundle} from "../types.ts";
