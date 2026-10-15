@@ -22,6 +22,14 @@ export interface PostArticleParams {
     [key: string]: string | undefined;
 }
 
+/** {@link ChannelApi.uploadImages} 결과. */
+export interface UploadedImages {
+    /** 업로드에 쓴 작성 폼 token — `postArticle({token})`으로 넘겨 같은 작성 세션으로 묶을 것. */
+    token: string;
+    /** 업로드된 이미지 URL (`//ac.arca.live/...`, 입력 순서). 본문에 `<img src>`로 사용. */
+    urls: string[];
+}
+
 export class ChannelApi {
     constructor(private http: Http, readonly slug: string) {}
 
@@ -116,6 +124,34 @@ export class ChannelApi {
         }
         const msg = json?.message ?? extractMessage(text) ?? `게시글 작성 실패 (${res.status})`;
         throw new ArcaApiError(res.status, {result: false, message: msg});
+    }
+
+    /**
+     * 글쓰기용 이미지 업로드 — 웹 에디터와 동일한 `POST /b/upload` (multipart `upload` + 작성 폼 `token`).
+     * 작성 폼 token은 페이지마다 새로 발급되므로 반환된 token을 `postArticle({token})`에 넘길 것.
+     * ```ts
+     * const {token, urls} = await ch.uploadImages([Bun.file("a.webp")]);
+     * await ch.postArticle({title, content: urls.map(u => `<p><img src="${u}"></p>`).join(""), token});
+     * ```
+     */
+    async uploadImages(files: Blob[]): Promise<UploadedImages> {
+        const {html, cookie} = await fetchWithSso(this.http, `/b/${this.slug}/write`);
+        const token = parseHiddenInputs(html)["token"] ?? "";
+        const urls: string[] = [];
+        for (const file of files) {
+            const body = new FormData();
+            body.append("upload", file, file instanceof File ? file.name : "upload");
+            body.append("token", token);
+            body.append("saveExif", "false");
+            body.append("saveFilename", "false");
+            const res = await this.http.web.post("/b/upload", {body, headers: {Cookie: cookie, Accept: "application/json"}});
+            const json = await res.json().catch(() => null) as {link?: string; message?: string} | null;
+            if (!res.ok || !json?.link) {
+                throw new ArcaApiError(res.status, {result: false, message: json?.message ?? `이미지 업로드 실패 (${res.status})`});
+            }
+            urls.push(json.link);
+        }
+        return {token, urls};
     }
 
     /** 특정 게시글 진입점 */

@@ -7,6 +7,7 @@ import {form, formBody, Http} from "../src/internal/http.ts";
 import {paginateItems} from "../src/internal/paginate.ts";
 import {extractMessage, fetchWithSso, mergeCookies, parseHiddenInputs} from "../src/internal/webform.ts";
 import {ArcaApiError} from "../src/errors.ts";
+import {ChannelApi} from "../src/api/channel.ts";
 
 /** 요청을 기록하고 미리 정의된 Response를 반환하는 목업 fetch (ky는 fetch(Request)로 호출). */
 function mockFetch(handler: (url: string) => {status?: number; body?: string; headers?: Record<string, string>}) {
@@ -238,5 +239,37 @@ describe("webform - SSO 세션 캐시", () => {
         const http = new Http({fetch: m.fn});
         await expect(fetchWithSso(http, "/x")).rejects.toBeInstanceOf(ArcaApiError);
         expect(m.calls).toHaveLength(1);
+    });
+});
+
+describe("channel - 이미지 업로드", () => {
+    const writeFlow = (upload: () => {status?: number; body?: string}) => mockFetch((url) => {
+        if (url.includes("/api/app/sso-token")) return {body: `{"token":"jwt"}`};
+        if (url.startsWith("https://arca.live/sso")) return {status: 302, headers: {"set-cookie": "arca.at=abc; path=/"}};
+        if (url.endsWith("/b/upload")) return upload();
+        return {body: `<input type="hidden" name="_csrf" value="x"><input type="hidden" name="token" value="TK">`};
+    });
+
+    test("폼 token 1회 발급 → 파일마다 /b/upload, 세션 쿠키 + token 전송, link 반환", async () => {
+        let n = 0;
+        const m = writeFlow(() => ({body: JSON.stringify({uploaded: true, link: `//ac.arca.live/${++n}.webp`})}));
+        const ch = new ChannelApi(new Http({fetch: m.fn}), "test");
+        const result = await ch.uploadImages([new File(["a"], "a.webp", {type: "image/webp"}), new Blob(["b"], {type: "image/png"})]);
+        expect(result).toEqual({token: "TK", urls: ["//ac.arca.live/1.webp", "//ac.arca.live/2.webp"]});
+        const uploads = m.calls.filter(c => c.url.endsWith("/b/upload"));
+        expect(uploads).toHaveLength(2);
+        expect(uploads[0]!.headers.get("Cookie")).toBe("arca.at=abc");
+        expect(uploads[0]!.body).toMatch(/name="token"\r\n\r\nTK/);
+        expect(uploads[0]!.body).toContain(`filename="a.webp"`);
+        expect(m.calls.filter(c => c.url.endsWith("/b/test/write"))).toHaveLength(1);
+    });
+
+    test("업로드 실패 → ArcaApiError (서버 메시지)", async () => {
+        const m = writeFlow(() => ({status: 413, body: JSON.stringify({message: "파일이 너무 큽니다."})}));
+        const ch = new ChannelApi(new Http({fetch: m.fn}), "test");
+        const error = await ch.uploadImages([new Blob(["x"])]).catch(e => e);
+        expect(error).toBeInstanceOf(ArcaApiError);
+        expect(error.status).toBe(413);
+        expect(error.message).toBe("파일이 너무 큽니다.");
     });
 });

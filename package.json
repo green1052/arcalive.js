@@ -1,6 +1,6 @@
 {
     "name": "@green-1052/arcalive.js",
-    "version": "0.6.1",
+    "version": "0.7.0",
     "license": "GPL-3.0-only",
     "module": "src/index.ts",
     "description": "arca.live 비공식 API 클라이언트",

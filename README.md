@@ -57,6 +57,14 @@ const {articleId} = await ch.postArticle({
     content: "<p>본문</p>",
 });
 
+// 이미지 첨부 — 웹 에디터와 동일한 /b/upload. 반환된 token을 글쓰기에 넘겨 같은 작성 세션으로 묶음
+const {token, urls} = await ch.uploadImages([Bun.file("chart.webp")]);
+await ch.postArticle({
+    title: "이미지 글",
+    content: urls.map(url => `<p><img src="${url}"></p>`).join(""),
+    token,
+});
+
 // 댓글 / 대댓글 / 아카콘
 const comments = ch.article(articleId).comments();
 const c = await comments.create({content: "댓글"});

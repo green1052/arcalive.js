@@ -73,7 +73,7 @@ export class ArcaClient {
 
 export {AuthApi} from "./api/auth.ts";
 export {ChannelsApi} from "./api/channels.ts";
-export {ChannelApi, type PostArticleParams} from "./api/channel.ts";
+export {ChannelApi, type PostArticleParams, type UploadedImages} from "./api/channel.ts";
 export {ArticleApi} from "./api/article.ts";
 export {CommentsApi, type PostCommentParams, type EditCommentParams} from "./api/comments.ts";
 export {NotificationsApi} from "./api/notifications.ts";
